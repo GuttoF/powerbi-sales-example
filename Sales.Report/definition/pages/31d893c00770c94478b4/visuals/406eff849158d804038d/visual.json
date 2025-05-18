@@ -1,0 +1,156 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.7.0/schema.json",
+  "name": "406eff849158d804038d",
+  "position": {
+    "x": 440,
+    "y": 64,
+    "z": 1,
+    "height": 576,
+    "width": 840
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dProdutos"
+                    }
+                  },
+                  "Property": "Categoria"
+                }
+              },
+              "queryRef": "dProdutos.Categoria",
+              "nativeQueryRef": "Categoria"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Medidas"
+                    }
+                  },
+                  "Property": "Faturamento"
+                }
+              },
+              "queryRef": "Medidas.Faturamento",
+              "nativeQueryRef": "Faturamento"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "dProdutos"
+                    }
+                  },
+                  "Property": "Produto"
+                }
+              },
+              "queryRef": "dProdutos.Produto",
+              "nativeQueryRef": "Produto"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Medidas"
+                    }
+                  },
+                  "Property": "Meta"
+                }
+              },
+              "queryRef": "Medidas.Metas",
+              "nativeQueryRef": "Meta"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Medidas"
+                    }
+                  },
+                  "Property": "% Vendas Meta"
+                }
+              },
+              "queryRef": "Medidas.% Vendas Meta",
+              "nativeQueryRef": "% Vendas Meta"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Medidas"
+                    }
+                  },
+                  "Property": "Var Meta"
+                }
+              },
+              "queryRef": "Medidas.Var Meta",
+              "nativeQueryRef": "Var Meta"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "dProdutos"
+                  }
+                },
+                "Property": "Produto"
+              }
+            },
+            "direction": "Descending"
+          }
+        ]
+      }
+    },
+    "objects": {
+      "columnWidth": [
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "105.08571428571429D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "Medidas.Metas"
+          }
+        },
+        {
+          "properties": {
+            "value": {
+              "expr": {
+                "Literal": {
+                  "Value": "223.77142857142857D"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "dProdutos.Produto"
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

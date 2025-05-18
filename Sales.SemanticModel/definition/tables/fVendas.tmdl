@@ -12,51 +12,50 @@ table fVendas
 
 	column 'Data.Pedido'
 		dataType: dateTime
+		isHidden
 		formatString: Long Date
 		lineageTag: c4436531-8fbd-4a65-bb11-09657dd5482a
 		summarizeBy: none
 		sourceColumn: Data.Pedido
 
-		variation Variation
-			isDefault
-			relationship: 80225bf6-ed20-4d50-b9c1-345609c777d4
-			defaultHierarchy: LocalDateTable_ad075d2e-c76b-461d-b9ce-035d89aeb412.'Hierarquia de datas'
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
 		annotation UnderlyingDateTimeDataType = Date
 
-	column Vendedor
-		dataType: string
-		lineageTag: 4238a581-229c-4a60-a2db-03dd9b7e3529
-		summarizeBy: none
-		sourceColumn: Vendedor
-
-		annotation SummarizationSetBy = Automatic
-
 	column Armazem
 		dataType: string
+		isHidden
 		lineageTag: 791fc953-9eec-43d7-b96b-81fc56d8d5bf
 		summarizeBy: none
 		sourceColumn: Armazem
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
 	column 'Cod.Cliente'
 		dataType: int64
+		isHidden
 		formatString: 0
 		lineageTag: 16eede25-6af4-4c6b-b968-1994cdee3923
 		summarizeBy: none
 		sourceColumn: Cod.Cliente
 
+		changedProperty = IsHidden
+
 		annotation SummarizationSetBy = Automatic
 
-	column 'Cod.Barras'
+	column 'Cod.Produto'
 		dataType: int64
+		isHidden
 		formatString: 0
 		lineageTag: c5cc7a3c-b1dc-4207-a979-1ecbd23c7d0d
-		summarizeBy: sum
-		sourceColumn: Cod.Barras
+		summarizeBy: none
+		sourceColumn: Cod.Produto
+
+		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = Automatic
 
@@ -91,12 +90,23 @@ table fVendas
 
 	column 'Cod.Vendedor'
 		dataType: int64
+		isHidden
 		formatString: 0
 		lineageTag: d268d0cd-4a77-440a-94ce-11e083d1950b
 		summarizeBy: none
 		sourceColumn: Cod.Vendedor
 
+		changedProperty = IsHidden
+
 		annotation SummarizationSetBy = Automatic
+
+	column 'Vl.Total' = fVendas[Qtde] * fVendas[Vl.Unitario]
+		lineageTag: f93282fa-b5b7-4537-aaed-1fbb7316691c
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	partition fVendas = m
 		mode: import
@@ -111,11 +121,11 @@ table fVendas
 				    #"Texto Inserido Antes do Delimitador" = Table.AddColumn(#"Colunas Renomeadas", "Texto Antes do Delimitador", each Text.BeforeDelimiter([Vendedor], "-"), type text),
 				    #"Colunas Renomeadas1" = Table.RenameColumns(#"Texto Inserido Antes do Delimitador",{{"Texto Antes do Delimitador", "Cod.Vendedor"}}),
 				    #"Texto Extraído Após o Delimitador" = Table.TransformColumns(#"Colunas Renomeadas1", {{"Vendedor", each Text.AfterDelimiter(_, "-"), type text}}),
-				    #"Tipo Alterado2" = Table.TransformColumnTypes(#"Texto Extraído Após o Delimitador",{{"Cod.Vendedor", Int64.Type}})
+				    #"Tipo Alterado2" = Table.TransformColumnTypes(#"Texto Extraído Após o Delimitador",{{"Cod.Vendedor", Int64.Type}}),
+				    #"Colunas Renomeadas2" = Table.RenameColumns(#"Tipo Alterado2",{{"Cod.Barras", "Cod.Produto"}}),
+				    #"Colunas Removidas" = Table.RemoveColumns(#"Colunas Renomeadas2",{"Vendedor"})
 				in
-				    #"Tipo Alterado2"
-
-	changedProperty = Name
+				    #"Colunas Removidas"
 
 	annotation PBI_NavigationStepName = Navegação
 

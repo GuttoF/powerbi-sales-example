@@ -1,0 +1,65 @@
+table fMetas
+	lineageTag: 98ad0d1d-6271-46e2-b215-747d6427f318
+
+	column 'Data.Meta'
+		dataType: dateTime
+		isHidden
+		formatString: Long Date
+		lineageTag: 0fe8f605-5a77-4bf0-ad0a-9980e7fbec2d
+		summarizeBy: none
+		sourceColumn: Data.Meta
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Armazem
+		dataType: string
+		isHidden
+		lineageTag: 8bc263e0-cd77-4872-ac75-c371718007c9
+		summarizeBy: none
+		sourceColumn: Armazem
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Cod.Produto'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: ace9958d-ec1e-4ab9-814a-5c7a69180e6d
+		summarizeBy: none
+		sourceColumn: Cod.Produto
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Vl.Meta'
+		dataType: double
+		formatString: 0
+		lineageTag: 398d7cb8-aeab-4e78-8205-149c8eac4db6
+		summarizeBy: none
+		sourceColumn: Vl.Meta
+
+		annotation SummarizationSetBy = User
+
+	partition fMetas = m
+		mode: import
+		source =
+				let
+				    Fonte = Csv.Document(Web.Contents("https://cubotres.com.br/arquivos/metas.csv"),[Delimiter=";", Columns=4, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Cabeçalhos Promovidos" = Table.PromoteHeaders(Fonte, [PromoteAllScalars=true]),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(#"Cabeçalhos Promovidos",{{"Data.Meta", type date}, {"Armazem", type text}, {"Cod.Barras", Int64.Type}, {"Vl.Meta", Int64.Type}}),
+				    #"Colunas Renomeadas" = Table.RenameColumns(#"Tipo Alterado",{{"Cod.Barras", "Cod.Produto"}}),
+				    #"Coluna dividida" = Table.TransformColumns(#"Colunas Renomeadas", {{"Vl.Meta", each _ / 100, type number}})
+				in
+				    #"Coluna dividida"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegação
+

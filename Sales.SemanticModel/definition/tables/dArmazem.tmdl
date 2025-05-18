@@ -1,0 +1,25 @@
+table dArmazem
+	lineageTag: 7e0e261f-8397-403e-8fde-55e93640388f
+
+	column Armazem
+		dataType: string
+		lineageTag: 75e319f3-51c5-44a1-aea3-d29978279827
+		summarizeBy: none
+		sourceColumn: Armazem
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dArmazem = m
+		mode: import
+		source =
+				let
+				    Fonte = fMetas,
+				    #"Colunas Removidas" = Table.RemoveColumns(Fonte,{"Data.Meta", "Cod.Produto", "Vl.Meta"}),
+				    #"Duplicatas Removidas" = Table.Distinct(#"Colunas Removidas")
+				in
+				    #"Duplicatas Removidas"
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+

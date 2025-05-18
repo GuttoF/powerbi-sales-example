@@ -2,12 +2,20 @@ table dCalendario
 	lineageTag: 39c69b70-3895-43fd-b649-8df9a5c80318
 
 	column 'Data.Pedido'
-		dataType: string
+		dataType: dateTime
+		formatString: Long Date
 		lineageTag: b597f116-1d30-42c1-ac74-ac91bd973a94
 		summarizeBy: none
 		sourceColumn: Data.Pedido
 
+		variation Variation
+			isDefault
+			relationship: 9171688a-92a4-4d24-86d7-1ae22df1fa76
+			defaultHierarchy: LocalDateTable_437742aa-f17e-4344-830d-bf998d245607.'Hierarquia de datas'
+
 		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
 
 	column Ano
 		dataType: int64
@@ -79,9 +87,10 @@ table dCalendario
 				    #"Semana do Ano Inserida" = Table.AddColumn(#"Trimestre Inserido", "Semana do Ano", each Date.WeekOfYear([Data.Pedido]), Int64.Type),
 				    #"Nome do Dia Inserido" = Table.AddColumn(#"Semana do Ano Inserida", "Nome do Dia", each Date.DayOfWeekName([Data.Pedido]), type text),
 				    #"Colocar Cada Palavra Em Maiúscula" = Table.AddColumn(#"Semana do Ano Inserida", "Nome do Dia", each Date.ToText([Data.Pedido], "dddd", "pt-BR"), type text),
-				    #"Colocar Cada Palavra Em Maiúscula1" = Table.TransformColumns(#"Colocar Cada Palavra Em Maiúscula",{{"Nome do Mês", Text.Proper, type text}, {"Nome do Dia", Text.Proper, type text}})
+				    #"Colocar Cada Palavra Em Maiúscula1" = Table.TransformColumns(#"Colocar Cada Palavra Em Maiúscula",{{"Nome do Mês", Text.Proper, type text}, {"Nome do Dia", Text.Proper, type text}}),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(#"Colocar Cada Palavra Em Maiúscula1",{{"Data.Pedido", type date}})
 				in
-				    #"Colocar Cada Palavra Em Maiúscula1"
+				    #"Tipo Alterado"
 
 	annotation PBI_NavigationStepName = Navegação
 

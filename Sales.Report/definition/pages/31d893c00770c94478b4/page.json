@@ -5,11 +5,20 @@
   "displayOption": "FitToPage",
   "height": 720,
   "width": 1280,
-  "visualInteractions": [
-    {
-      "source": "e1b09347c6236c05808b",
-      "target": "8c3e4169701240429ca6",
-      "type": "HighlightFilter"
-    }
-  ]
+  "objects": {
+    "displayArea": [
+      {
+        "properties": {
+          "verticalAlignment": {
+            "expr": {
+              "Literal": {
+                "Value": "'Middle'"
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "visualInteractions": []
 }

@@ -1,17 +1,16 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.7.0/schema.json",
-  "name": "8c3e4169701240429ca6",
+  "name": "6ae454ebd4b03ae6a08d",
   "position": {
-    "x": 80,
-    "y": 416,
+    "x": 24,
+    "y": 24,
     "z": 0,
-    "height": 264,
-    "width": 360,
-    "tabOrder": 2000
+    "height": 280,
+    "width": 568,
+    "tabOrder": 0
   },
   "visual": {
     "visualType": "clusteredBarChart",
-    "autoSelectVisualType": true,
     "query": {
       "queryState": {
         "Category": {
@@ -21,14 +20,14 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "fVendas"
+                      "Entity": "dClientes"
                     }
                   },
-                  "Property": "Armazem"
+                  "Property": "Grupo.Cliente"
                 }
               },
-              "queryRef": "Vendas.Armazem",
-              "nativeQueryRef": "Armazem",
+              "queryRef": "dClientes.Grupo.Cliente",
+              "nativeQueryRef": "Grupo.Cliente",
               "active": true
             }
           ]
@@ -37,22 +36,17 @@
           "projections": [
             {
               "field": {
-                "Aggregation": {
+                "Measure": {
                   "Expression": {
-                    "Column": {
-                      "Expression": {
-                        "SourceRef": {
-                          "Entity": "fVendas"
-                        }
-                      },
-                      "Property": "Vl.Frete"
+                    "SourceRef": {
+                      "Entity": "Medidas"
                     }
                   },
-                  "Function": 1
+                  "Property": "SomaFrete"
                 }
               },
-              "queryRef": "Avg(Vendas.Vl.Frete)",
-              "nativeQueryRef": "Média de Vl.Frete"
+              "queryRef": "Medidas.SomaFrete",
+              "nativeQueryRef": "SomaFrete"
             }
           ]
         }
@@ -61,23 +55,19 @@
         "sort": [
           {
             "field": {
-              "Aggregation": {
+              "Measure": {
                 "Expression": {
-                  "Column": {
-                    "Expression": {
-                      "SourceRef": {
-                        "Entity": "fVendas"
-                      }
-                    },
-                    "Property": "Vl.Frete"
+                  "SourceRef": {
+                    "Entity": "Medidas"
                   }
                 },
-                "Function": 1
+                "Property": "SomaFrete"
               }
             },
             "direction": "Descending"
           }
-        ]
+        ],
+        "isDefaultSort": true
       }
     },
     "drillFilterOtherVisuals": true

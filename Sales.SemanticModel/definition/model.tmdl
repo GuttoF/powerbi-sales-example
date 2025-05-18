@@ -6,7 +6,7 @@ model Model
 		legacyRedirects
 		returnErrorValuesAsNull
 
-annotation PBI_QueryOrder = ["fVendas","Produtos","dClientes","dVendedores","dCalendario"]
+annotation PBI_QueryOrder = ["fVendas","fMetas","dProdutos","dClientes","dVendedores","dCalendario","Medidas","dArmazem"]
 
 annotation __PBI_TimeIntelligenceEnabled = 1
 
@@ -16,11 +16,14 @@ annotation PBI_ProTooling = ["DevMode"]
 
 ref table fVendas
 ref table DateTableTemplate_d893f530-be70-4912-9c77-ca4781411e09
-ref table LocalDateTable_ad075d2e-c76b-461d-b9ce-035d89aeb412
-ref table Produtos
+ref table dProdutos
 ref table dClientes
 ref table dVendedores
 ref table dCalendario
+ref table LocalDateTable_437742aa-f17e-4344-830d-bf998d245607
+ref table fMetas
+ref table Medidas
+ref table dArmazem
 
 ref cultureInfo pt-BR
 

@@ -1,0 +1,5 @@
+Faturamento = SUM(fVendas[Vl.Total])
+Meta = SUM(fMetas[Vl.Meta])
+SomaFrete = SUM(fVendas[Vl.Frete])
+Var Meta = [% Vendas Meta] - 1
+% Vendas Meta = [Faturamento] / [Meta]

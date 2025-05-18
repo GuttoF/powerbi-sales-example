@@ -1,0 +1,49 @@
+table dProdutos
+	lineageTag: 8a7f27f0-ebe8-49a0-9dfc-900ce2ad7200
+
+	column 'Cod.Produto'
+		dataType: int64
+		formatString: 0
+		lineageTag: 9b3cb5a2-2ca5-40c3-a79a-9230bc6cd6ae
+		summarizeBy: none
+		sourceColumn: Cod.Produto
+
+		annotation SummarizationSetBy = Automatic
+
+	column Produto
+		dataType: string
+		lineageTag: 328528f5-734c-46f6-a535-752c59f5c7e7
+		summarizeBy: none
+		sourceColumn: Produto
+
+		annotation SummarizationSetBy = Automatic
+
+	column Categoria
+		dataType: string
+		lineageTag: 5d37c665-983c-45e8-9369-cc08174e5544
+		summarizeBy: none
+		sourceColumn: Categoria
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dProdutos = m
+		mode: import
+		source =
+				let
+				    Fonte = Excel.Workbook(File.Contents("C:\Users\gutto\Workspace\powerbi-sales-example\data\Produtos.xlsx"), null, true),
+				    Produtos_Sheet = Fonte{[Item="Produtos",Kind="Sheet"]}[Data],
+				    #"Cabeçalhos Promovidos" = Table.PromoteHeaders(Produtos_Sheet, [PromoteAllScalars=true]),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(#"Cabeçalhos Promovidos",{{"Cod.Produto", type any}, {"Produto", type text}}),
+				    #"Coluna Condicional Adicionada" = Table.AddColumn(#"Tipo Alterado", "Categoria", each if [Cod.Produto] = "-" then [Produto] else null),
+				    #"Preenchido Abaixo" = Table.FillDown(#"Coluna Condicional Adicionada",{"Categoria"}),
+				    #"Linhas Filtradas" = Table.SelectRows(#"Preenchido Abaixo", each ([Cod.Produto] <> "-")),
+				    #"Texto Extraído Antes do Delimitador" = Table.TransformColumns(#"Linhas Filtradas", {{"Categoria", each Text.BeforeDelimiter(_, "("), type text}}),
+				    #"Texto Aparado" = Table.TransformColumns(#"Texto Extraído Antes do Delimitador",{{"Categoria", Text.Trim, type text}}),
+				    #"Tipo Alterado1" = Table.TransformColumnTypes(#"Texto Aparado",{{"Categoria", type text}, {"Cod.Produto", Int64.Type}})
+				in
+				    #"Tipo Alterado1"
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navegação
+
