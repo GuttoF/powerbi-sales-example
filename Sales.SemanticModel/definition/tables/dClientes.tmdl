@@ -1,0 +1,58 @@
+table dClientes
+	lineageTag: 5402e61e-2ac5-4ae0-9d2a-b055b556f738
+
+	column 'Cod.Cliente'
+		dataType: int64
+		formatString: 0
+		lineageTag: 912d970b-95f1-4263-a76f-391031ff9817
+		summarizeBy: none
+		sourceColumn: Cod.Cliente
+
+		annotation SummarizationSetBy = Automatic
+
+	column Cliente
+		dataType: string
+		lineageTag: 1d2061d5-c7c0-4e12-a461-7fb6d15499a0
+		summarizeBy: none
+		sourceColumn: Cliente
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Grupo.Cliente'
+		dataType: string
+		lineageTag: 2b527046-c2cd-4c3f-b693-239a232ff93e
+		summarizeBy: none
+		sourceColumn: Grupo.Cliente
+
+		annotation SummarizationSetBy = Automatic
+
+	column Cidade
+		dataType: string
+		lineageTag: 4d98307e-2f53-42a0-bd64-938c4934199f
+		summarizeBy: none
+		sourceColumn: Cidade
+
+		annotation SummarizationSetBy = Automatic
+
+	column Estado
+		dataType: string
+		lineageTag: 7abe03ec-583e-4770-a2d0-535f6b7c6524
+		summarizeBy: none
+		sourceColumn: Estado
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dClientes = m
+		mode: import
+		source =
+				let
+				    Fonte = Csv.Document(File.Contents("C:\Users\gutto\Workspace\powerbi-sales-example\data\Clientes.csv"),[Delimiter=";", Columns=5, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+				    #"Cabeçalhos Promovidos" = Table.PromoteHeaders(Fonte, [PromoteAllScalars=true]),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(#"Cabeçalhos Promovidos",{{"Cod.Cliente", Int64.Type}, {"Cliente", type text}, {"Grupo.Cliente", type text}, {"Cidade", type text}, {"Estado", type text}})
+				in
+				    #"Tipo Alterado"
+
+	changedProperty = Name
+
+	annotation PBI_ResultType = Table
+

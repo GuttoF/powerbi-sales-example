@@ -1,0 +1,42 @@
+table dVendedores
+	lineageTag: a267c7c1-999a-45f2-a54a-685e7ecf5458
+
+	column 'Cod.Vendedor'
+		dataType: int64
+		formatString: 0
+		lineageTag: ad58a427-4ff5-4f75-be46-a0fd2c057205
+		summarizeBy: none
+		sourceColumn: Cod.Vendedor
+
+		annotation SummarizationSetBy = Automatic
+
+	column Vendedor
+		dataType: string
+		lineageTag: 07182cd2-3a2d-48db-89e4-fec0dd7045f7
+		summarizeBy: none
+		sourceColumn: Vendedor
+
+		annotation SummarizationSetBy = Automatic
+
+	column Gerente
+		dataType: string
+		lineageTag: a284c08d-49e8-45b4-a6ac-7b67cda85474
+		summarizeBy: none
+		sourceColumn: Gerente
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dVendedores = m
+		mode: import
+		source =
+				let
+				    Fonte = Csv.Document(File.Contents("C:\Users\gutto\Workspace\powerbi-sales-example\data\Vendedores.csv"),[Delimiter=";", Columns=3, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Cabeçalhos Promovidos" = Table.PromoteHeaders(Fonte, [PromoteAllScalars=true]),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(#"Cabeçalhos Promovidos",{{"Cod.Vendedor", Int64.Type}, {"Vendedor", type text}, {"Gerente", type text}})
+				in
+				    #"Tipo Alterado"
+
+	changedProperty = Name
+
+	annotation PBI_ResultType = Table
+

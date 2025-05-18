@@ -1,0 +1,13 @@
+relationship 80225bf6-ed20-4d50-b9c1-345609c777d4
+	joinOnDateBehavior: datePartOnly
+	fromColumn: fVendas.'Data.Pedido'
+	toColumn: LocalDateTable_ad075d2e-c76b-461d-b9ce-035d89aeb412.Date
+
+relationship AutoDetected_2443a116-2f65-4c90-8c1b-6111011666d8
+	fromColumn: fVendas.'Cod.Vendedor'
+	toColumn: dVendedores.'Cod.Vendedor'
+
+relationship e82c2d3d-3866-35dd-0ec9-64fccf54b6a1
+	fromColumn: fVendas.'Cod.Cliente'
+	toColumn: dClientes.'Cod.Cliente'
+

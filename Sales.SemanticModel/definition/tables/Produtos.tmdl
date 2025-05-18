@@ -1,0 +1,32 @@
+table Produtos
+	lineageTag: 8a7f27f0-ebe8-49a0-9dfc-900ce2ad7200
+
+	column 'Cod.Produto'
+		dataType: string
+		lineageTag: 9b3cb5a2-2ca5-40c3-a79a-9230bc6cd6ae
+		summarizeBy: none
+		sourceColumn: Cod.Produto
+
+		annotation SummarizationSetBy = Automatic
+
+	column Produto
+		dataType: string
+		lineageTag: 328528f5-734c-46f6-a535-752c59f5c7e7
+		summarizeBy: none
+		sourceColumn: Produto
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Produtos = m
+		mode: import
+		source =
+				let
+				    Fonte = Excel.Workbook(File.Contents("C:\Users\gutto\Workspace\powerbi-sales-example\data\Produtos.xlsx"), null, true),
+				    Produtos_Sheet = Fonte{[Item="Produtos",Kind="Sheet"]}[Data],
+				    #"Cabeçalhos Promovidos" = Table.PromoteHeaders(Produtos_Sheet, [PromoteAllScalars=true]),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(#"Cabeçalhos Promovidos",{{"Cod.Produto", type any}, {"Produto", type text}})
+				in
+				    #"Tipo Alterado"
+
+	annotation PBI_ResultType = Table
+

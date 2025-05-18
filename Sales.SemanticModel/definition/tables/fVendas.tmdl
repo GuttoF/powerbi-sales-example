@@ -1,0 +1,123 @@
+table fVendas
+	lineageTag: 1d133c98-2130-4771-9aa3-b480e2f431be
+
+	column Pedido
+		dataType: int64
+		formatString: 0
+		lineageTag: 5c16674a-3324-4687-8957-5f5740a3fac5
+		summarizeBy: sum
+		sourceColumn: Pedido
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Data.Pedido'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: c4436531-8fbd-4a65-bb11-09657dd5482a
+		summarizeBy: none
+		sourceColumn: Data.Pedido
+
+		variation Variation
+			isDefault
+			relationship: 80225bf6-ed20-4d50-b9c1-345609c777d4
+			defaultHierarchy: LocalDateTable_ad075d2e-c76b-461d-b9ce-035d89aeb412.'Hierarquia de datas'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Vendedor
+		dataType: string
+		lineageTag: 4238a581-229c-4a60-a2db-03dd9b7e3529
+		summarizeBy: none
+		sourceColumn: Vendedor
+
+		annotation SummarizationSetBy = Automatic
+
+	column Armazem
+		dataType: string
+		lineageTag: 791fc953-9eec-43d7-b96b-81fc56d8d5bf
+		summarizeBy: none
+		sourceColumn: Armazem
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Cod.Cliente'
+		dataType: int64
+		formatString: 0
+		lineageTag: 16eede25-6af4-4c6b-b968-1994cdee3923
+		summarizeBy: none
+		sourceColumn: Cod.Cliente
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Cod.Barras'
+		dataType: int64
+		formatString: 0
+		lineageTag: c5cc7a3c-b1dc-4207-a979-1ecbd23c7d0d
+		summarizeBy: sum
+		sourceColumn: Cod.Barras
+
+		annotation SummarizationSetBy = Automatic
+
+	column Qtde
+		dataType: int64
+		formatString: 0
+		lineageTag: dd62ae20-1585-4575-af2e-d3dc850d148c
+		summarizeBy: sum
+		sourceColumn: Qtde
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Vl.Unitario'
+		dataType: double
+		lineageTag: 2980dce9-9ee0-45d6-b48e-abb9b2e86a79
+		summarizeBy: sum
+		sourceColumn: Vl.Unitario
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Vl.Frete'
+		dataType: double
+		lineageTag: 7eb9e95e-ad46-4cf9-9191-d1e5fa5d5dc0
+		summarizeBy: sum
+		sourceColumn: Vl.Frete
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Cod.Vendedor'
+		dataType: int64
+		formatString: 0
+		lineageTag: d268d0cd-4a77-440a-94ce-11e083d1950b
+		summarizeBy: none
+		sourceColumn: Cod.Vendedor
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fVendas = m
+		mode: import
+		source =
+				let
+				    Fonte = Excel.Workbook(File.Contents("C:\Users\gutto\Workspace\powerbi-sales-example\data\Vendas.xlsx"), null, true),
+				    Vendas_Table = Fonte{[Item="Vendas",Kind="Table"]}[Data],
+				    #"Tipo Alterado" = Table.TransformColumnTypes(Vendas_Table,{{"Pedido", Int64.Type}, {"Data.Pedido", type date}, {"Vendedor", type text}, {"Armazem", type text}, {"Cliente", type text}, {"Cod.Barras", Int64.Type}, {"Qtde", Int64.Type}, {"Vl.Unitario", type number}, {"Vl.Frete", type number}}),
+				    #"Texto Extraído Antes do Delimitador" = Table.TransformColumns(#"Tipo Alterado", {{"Cliente", each Text.BeforeDelimiter(_, "-"), type text}}),
+				    #"Tipo Alterado1" = Table.TransformColumnTypes(#"Texto Extraído Antes do Delimitador",{{"Cliente", Int64.Type}}),
+				    #"Colunas Renomeadas" = Table.RenameColumns(#"Tipo Alterado1",{{"Cliente", "Cod.Cliente"}}),
+				    #"Texto Inserido Antes do Delimitador" = Table.AddColumn(#"Colunas Renomeadas", "Texto Antes do Delimitador", each Text.BeforeDelimiter([Vendedor], "-"), type text),
+				    #"Colunas Renomeadas1" = Table.RenameColumns(#"Texto Inserido Antes do Delimitador",{{"Texto Antes do Delimitador", "Cod.Vendedor"}}),
+				    #"Texto Extraído Após o Delimitador" = Table.TransformColumns(#"Colunas Renomeadas1", {{"Vendedor", each Text.AfterDelimiter(_, "-"), type text}}),
+				    #"Tipo Alterado2" = Table.TransformColumnTypes(#"Texto Extraído Após o Delimitador",{{"Cod.Vendedor", Int64.Type}})
+				in
+				    #"Tipo Alterado2"
+
+	changedProperty = Name
+
+	annotation PBI_NavigationStepName = Navegação
+
+	annotation PBI_ResultType = Table
+
