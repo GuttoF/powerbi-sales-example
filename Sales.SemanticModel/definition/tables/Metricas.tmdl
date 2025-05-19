@@ -1,0 +1,624 @@
+table Metricas
+	lineageTag: bf931fb1-6941-4cfc-a2e5-961145a27353
+
+	measure FaturamentoItem = ```
+			SUMX(fVendas, fVendas[Qtde] * fVendas[Vl.Unitario])
+			
+			    
+			```
+		lineageTag: f932820d-1963-48e1-8f79-0e059928aa14
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Faturamento = ```
+			SUMX(fVendas, [FaturamentoItem])
+			    
+			```
+		lineageTag: e6c5fb56-4698-470e-bc95-a958aa426a5d
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Meta = ```
+			SUM(fMetas[Vl.Meta])
+			    
+			```
+		lineageTag: 325b08c6-22d4-42d5-9aa6-0b36779d4dd8
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure FreteSum = ```
+			SUM(fVendas[Vl.Frete])
+			    
+			```
+		lineageTag: c8ca46d0-fe26-49f7-bf8a-aacadb7b992e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure DataMax = ```
+			MAX(dCalendario[Data.Pedido])
+			    
+			```
+		formatString: General Date
+		lineageTag: 5e2469a4-bd5b-4fad-9d20-825cfcf12375
+
+	measure RankProduto = ```
+			RANKX(ALL(dProdutos[Cod.Produto]), [Faturamento], , DESC, DENSE)
+			
+			    
+			```
+		formatString: 0
+		lineageTag: 88fead4d-384f-4f14-8024-72caf515e38a
+
+	measure '% Faturamento Total' = ```
+			DIVIDE([Faturamento], CALCULATE([Faturamento], ALL(fVendas)))
+			    
+			```
+		lineageTag: 005b799f-aec8-426f-a501-83bfb6b15eae
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure '% Vendas Meta' = ```
+			DIVIDE([Faturamento], [Meta])
+			    
+			```
+		lineageTag: 8bdc0ac4-6f99-431e-8098-6d8947d1a8d9
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure '% Frete' = ```
+			DIVIDE([FreteSum], [Faturamento])
+			    
+			```
+		lineageTag: d01ea049-5037-43c1-8951-f5f1da1d06fc
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure '% Faturamento Produto' = ```
+			DIVIDE([Faturamento], CALCULATE([Faturamento], ALL(dProdutos)))
+			
+			    
+			```
+		lineageTag: 01e9a44c-27f5-442a-99a5-9504911c3d1b
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure '% Var MoM' = ```
+			
+			    VAR FaturamentoAtual = [Faturamento]
+			    VAR FaturamentoAnterior = [FaturamentoMoM]
+			    RETURN 
+			        IF(
+			            NOT ISBLANK(FaturamentoAtual) && NOT ISBLANK(FaturamentoAnterior),
+			            (FaturamentoAtual / FaturamentoAnterior) - 1,
+			            BLANK()
+			        )
+			
+			    
+			    
+			```
+		lineageTag: ed26e638-60e0-442b-8410-ea6f7ca8dccf
+
+	measure '% Var YoY' = ```
+			
+			    VAR ValorAtual = [Faturamento]
+			    VAR ValorAnterior = [FaturamentoYoY]
+			    RETURN
+			        IF(
+			            NOT ISBLANK(ValorAtual) &&
+			            NOT ISBLANK(ValorAnterior) &&
+			            ValorAnterior <> 0,
+			            (ValorAtual / ValorAnterior) - 1,
+			            BLANK()
+			        )
+			
+			    
+			```
+		lineageTag: f759c462-954c-4666-ba25-c7871b9af716
+
+	measure QtdeClientes = ```
+			DISTINCTCOUNT(fVendas[Cod.Cliente])
+			    
+			```
+		formatString: 0
+		lineageTag: 11253ffe-f61d-463b-9f41-4284c1a8fedb
+
+	measure QtdePedidos = ```
+			DISTINCTCOUNT(fVendas[Pedido])
+			    
+			```
+		formatString: 0
+		lineageTag: 1a1308b0-60e6-402e-8037-eece79054baa
+
+	measure QtdeVendas = ```
+			COUNTROWS(fVendas)
+			    
+			```
+		formatString: 0
+		lineageTag: f91e811f-e515-4045-810d-73d374cc0b48
+
+	measure QtdeProdutosVendidos = ```
+			DISTINCTCOUNT(fVendas[Cod.Produto])
+				
+				
+			```
+		formatString: 0
+		lineageTag: 837f7db2-e6a1-4f5b-9517-6eb04d500ed9
+
+	measure 'Ticket Medio' = ```
+			
+				VAR TemPedido = ISINSCOPE(fVendas[Pedido])
+				VAR TemCliente = ISINSCOPE(fVendas[Cod.Cliente]) || ISINSCOPE(dClientes[Cod.Cliente])
+				VAR TemProduto = ISINSCOPE(fVendas[Cod.Produto]) || ISINSCOPE(dProdutos[Cod.Produto])
+			
+				RETURN
+			    	SWITCH(
+			        	TRUE(),
+			        	TemPedido, [Faturamento],  -- Por pedido, mostra o valor bruto
+			        	TemCliente || TemProduto, 
+			            	AVERAGEX(
+			                	VALUES(fVendas[Pedido]),
+			                	[Faturamento]
+			            	),  -- Média por pedido, mostra no filtro
+			        	DIVIDE([Faturamento], [QtdePedidos])  -- Visão geral
+			    	)
+				
+			    
+			```
+		lineageTag: 245e7f96-d1eb-447f-9d2a-a84fc614a7fe
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Ticket Medio Cliente' = ```
+			DIVIDE([Faturamento], [QtdeClientes])
+			    
+			```
+		lineageTag: cac0c926-7d94-4c76-a435-2577cd81ad72
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Ticket Medio Mensal' = ```
+			
+				AVERAGEX(
+			    	SUMMARIZE(
+			        	dCalendario,
+			        	dCalendario[Ano],
+			        	dCalendario[Mês],
+			        	"TicketMensal", [Ticket Medio Geral]
+			    	),
+			    	[TicketMensal]
+				)
+				
+				
+			```
+		lineageTag: b23c02b8-7853-4f68-a941-9faccb120d39
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure VarMeta = ```
+			[% Vendas Meta] - 1
+			
+			    
+			```
+		lineageTag: 421e5370-5993-4389-b2ec-f068d7ee0a0e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure FaturamentoMTD = ```
+			TOTALMTD([Faturamento], dCalendario[Data.Pedido])
+			    
+			```
+		lineageTag: f5f482fa-936c-4479-8acd-751f1bd8f667
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure FaturamentoQTD = ```
+			TOTALQTD([Faturamento], dCalendario[Data.Pedido])
+			    
+			```
+		lineageTag: ff863d50-4230-409b-9edf-c2c2333e3161
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure FaturamentoYTD = ```
+			TOTALYTD([Faturamento], dCalendario[Data.Pedido])
+			    
+			```
+		lineageTag: 2c617d0b-feae-4548-877f-1b0ab884982a
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure FaturamentoMoM = ```
+			CALCULATE([Faturamento], DATEADD(dCalendario[Data.Pedido], -1, MONTH)) 
+			    
+			```
+		lineageTag: 5f334913-6258-40d7-a9d1-11a8616d49e3
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure FaturamentoYoY = ```
+			CALCULATE([Faturamento], SAMEPERIODLASTYEAR(dCalendario[Data.Pedido]))
+			    
+			    
+			```
+		lineageTag: 4cbeb25c-fa1a-431c-94f9-6a57557e82d3
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure FaturamentoAcumulado = ```
+			
+			    CALCULATE(
+			        [Faturamento],
+			        FILTER(
+			            ALL(dCalendario[Data.Pedido]),
+			            dCalendario[Data.Pedido] <= MAX(dCalendario[Data.Pedido])
+			        )
+			    )
+			
+			    
+			```
+		lineageTag: a2de70de-75a3-4923-a4e1-41c2330508f1
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure FaturamentoSubTotal = ```
+			DIVIDE([Faturamento], CALCULATE([Faturamento], ALLSELECTED(fVendas)))
+				
+				
+			```
+		lineageTag: 0d5f710d-71bd-4745-8d0a-66e1ccbbdaa0
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure FaturamentoBimestre = ```
+			
+			    VAR DataFinal = MAX(dCalendario[Data.Pedido])
+			    VAR DataInicial = EDATE(DataFinal, -1)
+			    RETURN
+			        CALCULATE(
+			            [Faturamento],
+			            FILTER(
+			                ALL(dCalendario[Data.Pedido]),
+			                dCalendario[Data.Pedido] >= DataInicial &&
+			                dCalendario[Data.Pedido] <= DataFinal
+			            )
+			        )
+			
+			    
+			```
+		lineageTag: 85c8faf8-1013-475d-b4a2-83c1f07bf992
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure FaturamentoMin = ```
+			MINX(fVendas, [FaturamentoItem])
+			    
+			```
+		lineageTag: 31548dc4-545c-42be-a0e4-44122ce3f7fc
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure FaturamentoMax = ```
+			MAXX(fVendas, [FaturamentoItem])
+			    
+			```
+		lineageTag: 185f87af-60db-4d87-89f7-20786951ec55
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure FaturamentoMedia = ```
+			AVERAGEX(fVendas, [FaturamentoItem])
+			    
+			```
+		lineageTag: 460ca0c8-7a0e-402d-af75-0d7bdb08b134
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure FaturamentoMediana = ```
+			MEDIANX(fVendas, [FaturamentoItem])
+				
+				
+			```
+		lineageTag: 4fc03f49-7636-4b1e-ae03-f012b70598f7
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure MediaMovel3M = ```
+			AVERAGEX(
+			    DATESINPERIOD(dCalendario[Data.Pedido], MAX(dCalendario[Data.Pedido]), -3, MONTH),
+			    [Faturamento]
+			    )
+				
+				
+			```
+		lineageTag: 5b3ae256-cb97-4e1a-b248-28b96cd6cdb3
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure DiasComVenda = ```
+			
+			    CALCULATE(
+			        DISTINCTCOUNT(dCalendario[Data.Pedido]),
+			        fVendas
+			    )
+				
+				
+			```
+		formatString: 0
+		lineageTag: 9f241dfe-19c5-4ba3-9c15-c4ea00679327
+
+	measure QtdeClientesUltimos3M = ```
+			CALCULATE([QtdeClientes],
+			    DATESINPERIOD(dCalendario[Data.Pedido], MAX(dCalendario[Data.Pedido]), -3, MONTH))
+				
+				
+			```
+		formatString: 0
+		lineageTag: 7005f9c0-5cf1-4ef8-a886-fdd079557f6b
+
+	measure FaturamentoUltimos3M = ```
+			CALCULATE([Faturamento],
+			    DATESINPERIOD(dCalendario[Data.Pedido], MAX(dCalendario[Data.Pedido]), -3, MONTH))
+				
+			```
+		lineageTag: f0639eb7-7043-4f29-adbf-ef6945a0492d
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure FaturamentoUltimos6M = ```
+			CALCULATE([Faturamento],
+			    DATESINPERIOD(dCalendario[Data.Pedido], MAX(dCalendario[Data.Pedido]), -6, MONTH))
+				
+			```
+		lineageTag: d6d80ba6-1758-4df2-9d69-d48f6fa41527
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure MediaMove6M = ```
+			AVERAGEX(
+			    DATESINPERIOD(dCalendario[Data.Pedido], MAX(dCalendario[Data.Pedido]), -6, MONTH),
+			    [Faturamento]
+			    )
+			
+				
+			```
+		lineageTag: 610f97c6-0bbc-4ec8-bb3d-ce02f9bb031f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Ticket Medio Geral' = ```
+			DIVIDE([Faturamento], [QtdePedidos])
+			
+				
+			```
+		lineageTag: c4735373-d2cc-4d69-a5ee-a4ecb937d402
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Ticket Maximo' = ```
+			
+				MAXX(
+			    	VALUES(fVendas[Pedido]),
+			    	CALCULATE([Ticket Medio Geral])
+				)
+			
+				
+			```
+		lineageTag: aaa2aac8-6fbd-402d-986b-1d6db2a7308a
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Ticket Minimo' = ```
+			
+				MINX(
+			    	VALUES(fVendas[Pedido]),
+			    	CALCULATE([Ticket Medio Geral])
+				)
+			
+			    
+			```
+		lineageTag: bd8e4758-1b3f-4ba2-bd57-5f2c8ad25c2b
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Faturamento Medio Mensal' = ```
+			
+				AVERAGEX(
+			    	SUMMARIZE(
+			        	dCalendario,
+			        	dCalendario[Ano],
+			        	dCalendario[Mês],
+			        	"FaturamentoMensal", [Faturamento]
+			    	),
+			    	[FaturamentoMensal]
+				)
+			
+			    
+			```
+		lineageTag: 99b11363-d799-4cd0-9a10-e2bee8dff059
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure '% Faturamento Top 10 Produtos' = ```
+			
+				DIVIDE(
+			    CALCULATE([Faturamento],
+			        TOPN(10, ALL(dProdutos[Cod.Produto]), [Faturamento])),
+			    [Faturamento]
+				)
+				
+				
+			```
+		lineageTag: 46de8ac4-4df9-4dc8-bd60-ecafa8ba9903
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Taxa de Retencao' =
+			
+			VAR DataMaxima = MAX(dCalendario[Data.Pedido])
+			VAR DataInicioPeriodo = EDATE(DataMaxima, -12)
+			VAR DataFimPeriodoAnterior = EDATE(DataMaxima, -1)
+			
+			VAR ClientesAtivosInicio =
+			    CALCULATE(
+			        DISTINCTCOUNT(fVendas[Cod.Cliente]),
+			        FILTER(
+			            dCalendario,
+			            dCalendario[Data.Pedido] >= DataInicioPeriodo && dCalendario[Data.Pedido] < DataFimPeriodoAnterior
+			        )
+			    )
+			
+			VAR ClientesAtivosFim =
+			    CALCULATE(
+			        DISTINCTCOUNT(fVendas[Cod.Cliente]),
+			        FILTER(
+			            dCalendario,
+			            dCalendario[Data.Pedido] >= DataInicioPeriodo && dCalendario[Data.Pedido] <= DataMaxima
+			        )
+			    )
+			
+			VAR NovosClientes =
+			    CALCULATE(
+			        DISTINCTCOUNT(fVendas[Cod.Cliente]),
+			        FILTER(
+			            fVendas,
+			            fVendas[Data.Pedido] >= DataInicioPeriodo && fVendas[Data.Pedido] <= DataMaxima &&
+			            NOT(fVendas[Cod.Cliente] IN
+			                CALCULATETABLE(
+			                    DISTINCT(fVendas[Cod.Cliente]),
+			                    FILTER(
+			                        dCalendario,
+			                        dCalendario[Data.Pedido] < DataInicioPeriodo
+			                    )
+			                )
+			            )
+			        )
+			    )
+			
+			RETURN
+			    IF(
+			        NOT ISBLANK(ClientesAtivosInicio),
+			        DIVIDE(ClientesAtivosFim - NovosClientes, ClientesAtivosInicio),
+			        BLANK()
+			    )
+		lineageTag: 4dd9f32e-6147-42d4-a6dc-5f0631ed9d2e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure FaturamentoMedioMensal = ```
+			
+				AVERAGEX(
+			    	SUMMARIZE(
+			        	dCalendario,
+			        	dCalendario[Ano],
+			        	dCalendario[Mês],
+			        	"FaturamentoMensal", [Faturamento]
+			    	),
+			    	[FaturamentoMensal]
+				)
+				
+				
+			```
+		lineageTag: 53af9853-dcbf-43a9-be49-47b35ede5b23
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure FaturamentoMedioMensal3M = ```
+			CALCULATE(
+					[FaturamentoMedioMensal],
+					DATESINPERIOD(
+						dCalendario[Data.Pedido],
+						MAX(dCalendario[Data.Pedido]), -3, MONTH
+					)
+				)
+				
+				
+			```
+		lineageTag: efd61ede-558d-4545-985b-e87b2345deb7
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure QtdeClientesUltimos6M = ```
+			CALCULATE([QtdeClientes],
+			    DATESINPERIOD(dCalendario[Data.Pedido], MAX(dCalendario[Data.Pedido]), -6, MONTH))
+				
+				
+			```
+		formatString: 0
+		lineageTag: 608b0a4c-ed2d-451b-aee6-1ac81553aae9
+
+	measure QtdeClientesUltimos12M = ```
+			CALCULATE([QtdeClientes],
+			    DATESINPERIOD(dCalendario[Data.Pedido], MAX(dCalendario[Data.Pedido]), -12, MONTH))
+				
+				
+			```
+		formatString: 0
+		lineageTag: c24d6718-9b5a-4a2f-a55d-172737d6261d
+
+	measure FaturamentoUltimos12M = ```
+			CALCULATE([Faturamento],
+			    DATESINPERIOD(dCalendario[Data.Pedido], MAX(dCalendario[Data.Pedido]), -12, MONTH))
+			
+			    
+			```
+		lineageTag: deee4af9-2a78-419b-a9a4-c9686d84a9dd
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure FaturamentoMedioMensal6M = ```
+			CALCULATE(
+					[FaturamentoMedioMensal],
+					DATESINPERIOD(
+						dCalendario[Data.Pedido],
+						MAX(dCalendario[Data.Pedido]), -6, MONTH
+					)
+				)
+				
+				
+			```
+		lineageTag: 2a421cc9-5338-485b-b8af-4ba95c5c22e5
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure FaturamentoMedioMensal12M = ```
+			CALCULATE(
+					[FaturamentoMedioMensal],
+					DATESINPERIOD(
+						dCalendario[Data.Pedido],
+						MAX(dCalendario[Data.Pedido]), -12, MONTH
+					)
+				)
+			
+			
+			    
+			```
+		lineageTag: c9f69615-499b-4e35-83a0-5b32614ad877
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure MediaMove12M = ```
+			AVERAGEX(
+			    DATESINPERIOD(dCalendario[Data.Pedido], MAX(dCalendario[Data.Pedido]), -12, MONTH),
+			    [Faturamento]
+			    )
+			
+			    
+			```
+		lineageTag: 5c0dddad-8e32-446b-8ed0-a2bc8bf5883d
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition Metricas = m
+		mode: import
+		source =
+				let
+				    Fonte = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [#"Coluna 1" = _t]),
+				    #"Tipo Alterado" = Table.TransformColumnTypes(Fonte,{{"Coluna 1", type text}}),
+				    #"Colunas Removidas" = Table.RemoveColumns(#"Tipo Alterado",{"Coluna 1"})
+				in
+				    #"Colunas Removidas"
+
+	changedProperty = Name
+
+	annotation PBI_ResultType = Table
+

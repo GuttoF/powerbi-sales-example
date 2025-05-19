@@ -6,7 +6,7 @@ model Model
 		legacyRedirects
 		returnErrorValuesAsNull
 
-annotation PBI_QueryOrder = ["fVendas","fMetas","dProdutos","dClientes","dVendedores","dCalendario","Medidas","dArmazem"]
+annotation PBI_QueryOrder = ["fVendas","fMetas","dProdutos","dClientes","dVendedores","dCalendario","dArmazem","Metricas"]
 
 annotation __PBI_TimeIntelligenceEnabled = 1
 
@@ -20,8 +20,8 @@ ref table dClientes
 ref table dVendedores
 ref table dCalendario
 ref table fMetas
-ref table Medidas
 ref table dArmazem
+ref table Metricas
 
 ref cultureInfo pt-BR
 

@@ -5,7 +5,7 @@ table dCalendario
 	column 'Data.Pedido'
 		dataType: dateTime
 		isKey
-		formatString: Long Date
+		formatString: Short Date
 		lineageTag: b597f116-1d30-42c1-ac74-ac91bd973a94
 		summarizeBy: none
 		sourceColumn: Data.Pedido
@@ -100,6 +100,37 @@ table dCalendario
 		changedProperty = IsHidden
 
 		annotation SummarizationSetBy = User
+
+	hierarchy 'Data.Pedido Hierarquia'
+		lineageTag: 6bd5395e-f86b-49ae-9e99-1a5a8515ac7e
+
+		level 'Data.Pedido'
+			lineageTag: c1bf32c2-00c1-4cbc-b620-59dd91548903
+			column: 'Data.Pedido'
+
+		level Ano
+			lineageTag: ab1f4e42-ded7-4fc2-b60b-9ff4f8e53410
+			column: Ano
+
+		level Trimestre
+			lineageTag: ddf4b24f-9f7c-411e-a018-9b409ab9084e
+			column: Trimestre
+
+		level Mês
+			lineageTag: f14b5d7d-3f7b-426b-a6f9-23327619188e
+			column: Mês
+
+		level 'Nome do Mês'
+			lineageTag: 0dcdfca2-3e58-42de-8472-a8f4fa6628a1
+			column: 'Nome do Mês'
+
+		level 'Dia da Semana'
+			lineageTag: 89f43a18-727e-476d-acf5-93719eff19a8
+			column: 'Dia da Semana'
+
+		level 'Nome do Dia'
+			lineageTag: 8f166b29-4a4a-4873-bbd5-73bbf69d38be
+			column: 'Nome do Dia'
 
 	partition dCalendario = m
 		mode: import

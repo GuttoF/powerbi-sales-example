@@ -1,0 +1,259 @@
+DEFINE
+    MEASURE Metricas[FaturamentoItem] = SUMX(fVendas, fVendas[Qtde] * fVendas[Vl.Unitario])
+
+    MEASURE Metricas[Faturamento] = SUMX(fVendas, [FaturamentoItem])
+    MEASURE Metricas[Meta] = SUM(fMetas[Vl.Meta])
+    MEASURE Metricas[FreteSum] = SUM(fVendas[Vl.Frete])
+    MEASURE Metricas[DataMax] = MAX(dCalendario[Data.Pedido])
+    MEASURE Metricas[RankProduto] = RANKX(ALL(dProdutos[Cod.Produto]), [Faturamento], , DESC, DENSE)
+
+    MEASURE Metricas[% Faturamento Total] = DIVIDE([Faturamento], CALCULATE([Faturamento], ALL(fVendas)))
+    MEASURE Metricas[% Vendas Meta] = DIVIDE([Faturamento], [Meta])
+    MEASURE Metricas[% Frete] = DIVIDE([FreteSum], [Faturamento])
+    MEASURE Metricas[% Faturamento Produto] = DIVIDE([Faturamento], CALCULATE([Faturamento], ALL(dProdutos)))
+
+    MEASURE Metricas[% Var MoM] = 
+    VAR FaturamentoAtual = [Faturamento]
+    VAR FaturamentoAnterior = [FaturamentoMoM]
+    RETURN 
+        IF(
+            NOT ISBLANK(FaturamentoAtual) && NOT ISBLANK(FaturamentoAnterior),
+            (FaturamentoAtual / FaturamentoAnterior) - 1,
+            BLANK()
+        )
+
+    
+    MEASURE Metricas[% Var YoY] =
+    VAR ValorAtual = [Faturamento]
+    VAR ValorAnterior = [FaturamentoYoY]
+    RETURN
+        IF(
+            NOT ISBLANK(ValorAtual) &&
+            NOT ISBLANK(ValorAnterior) &&
+            ValorAnterior <> 0,
+            (ValorAtual / ValorAnterior) - 1,
+            BLANK()
+        )
+
+    MEASURE Metricas[QtdeClientes] = DISTINCTCOUNT(fVendas[Cod.Cliente])
+    MEASURE Metricas[QtdePedidos] = DISTINCTCOUNT(fVendas[Pedido])
+    MEASURE Metricas[QtdeVendas] = COUNTROWS(fVendas)
+    MEASURE Metricas[QtdeProdutosVendidos] = DISTINCTCOUNT(fVendas[Cod.Produto])
+	
+	MEASURE Metricas[QtdeClientesUltimos3M] = CALCULATE([QtdeClientes],
+    DATESINPERIOD(dCalendario[Data.Pedido], MAX(dCalendario[Data.Pedido]), -3, MONTH))
+	
+	MEASURE Metricas[QtdeClientesUltimos6M] = CALCULATE([QtdeClientes],
+    DATESINPERIOD(dCalendario[Data.Pedido], MAX(dCalendario[Data.Pedido]), -6, MONTH))
+	
+	MEASURE Metricas[QtdeClientesUltimos12M] = CALCULATE([QtdeClientes],
+    DATESINPERIOD(dCalendario[Data.Pedido], MAX(dCalendario[Data.Pedido]), -12, MONTH))
+	
+	MEASURE Metricas[Ticket Medio Geral] = DIVIDE([Faturamento], [QtdePedidos])
+
+	MEASURE Metricas[Ticket Medio] =
+	VAR TemPedido = ISINSCOPE(fVendas[Pedido])
+	VAR TemCliente = ISINSCOPE(fVendas[Cod.Cliente]) || ISINSCOPE(dClientes[Cod.Cliente])
+	VAR TemProduto = ISINSCOPE(fVendas[Cod.Produto]) || ISINSCOPE(dProdutos[Cod.Produto])
+
+	RETURN
+    	SWITCH(
+        	TRUE(),
+        	TemPedido, [Faturamento],  -- Por pedido, mostra o valor bruto
+        	TemCliente || TemProduto, 
+            	AVERAGEX(
+                	VALUES(fVendas[Pedido]),
+                	[Faturamento]
+            	),  -- Média por pedido, mostra no filtro
+        	DIVIDE([Faturamento], [QtdePedidos])  -- Visão geral
+    	)
+	
+    MEASURE Metricas[Ticket Medio Mensal] = 
+	AVERAGEX(
+    	SUMMARIZE(
+        	dCalendario,
+        	dCalendario[Ano],
+        	dCalendario[Mês],
+        	"TicketMensal", [Ticket Medio Geral]
+    	),
+    	[TicketMensal]
+	)
+	
+	MEASURE Metricas[Ticket Maximo] =
+	MAXX(
+    	VALUES(fVendas[Pedido]),
+    	CALCULATE([Ticket Medio Geral])
+	)
+
+	MEASURE Metricas[Ticket Minimo] =
+	MINX(
+    	VALUES(fVendas[Pedido]),
+    	CALCULATE([Ticket Medio Geral])
+	)
+
+    MEASURE Metricas[VarMeta] = [% Vendas Meta] - 1
+
+    MEASURE Metricas[FaturamentoMTD] = TOTALMTD([Faturamento], dCalendario[Data.Pedido])
+    MEASURE Metricas[FaturamentoQTD] = TOTALQTD([Faturamento], dCalendario[Data.Pedido])
+    MEASURE Metricas[FaturamentoYTD] = TOTALYTD([Faturamento], dCalendario[Data.Pedido])
+    MEASURE Metricas[FaturamentoMoM] = CALCULATE([Faturamento], DATEADD(dCalendario[Data.Pedido], -1, MONTH)) 
+    MEASURE Metricas[FaturamentoYoY] = CALCULATE([Faturamento], SAMEPERIODLASTYEAR(dCalendario[Data.Pedido]))
+    
+    MEASURE Metricas[FaturamentoAcumulado] =
+    CALCULATE(
+        [Faturamento],
+        FILTER(
+            ALL(dCalendario[Data.Pedido]),
+            dCalendario[Data.Pedido] <= MAX(dCalendario[Data.Pedido])
+        )
+    )
+
+    MEASURE Metricas[FaturamentoSubTotal] = DIVIDE([Faturamento], CALCULATE([Faturamento], ALLSELECTED(fVendas)))
+	
+	MEASURE Metricas[FaturamentoUltimos3M] = CALCULATE([Faturamento],
+    DATESINPERIOD(dCalendario[Data.Pedido], MAX(dCalendario[Data.Pedido]), -3, MONTH))
+	MEASURE Metricas[FaturamentoUltimos6M] = CALCULATE([Faturamento],
+    DATESINPERIOD(dCalendario[Data.Pedido], MAX(dCalendario[Data.Pedido]), -6, MONTH))
+	MEASURE Metricas[FaturamentoUltimos12M] = CALCULATE([Faturamento],
+    DATESINPERIOD(dCalendario[Data.Pedido], MAX(dCalendario[Data.Pedido]), -12, MONTH))
+
+    MEASURE Metricas[FaturamentoBimestre] =
+    VAR DataFinal = MAX(dCalendario[Data.Pedido])
+    VAR DataInicial = EDATE(DataFinal, -1)
+    RETURN
+        CALCULATE(
+            [Faturamento],
+            FILTER(
+                ALL(dCalendario[Data.Pedido]),
+                dCalendario[Data.Pedido] >= DataInicial &&
+                dCalendario[Data.Pedido] <= DataFinal
+            )
+        )
+
+    -- Estatísticas
+    MEASURE Metricas[FaturamentoMin] = MINX(fVendas, [FaturamentoItem])
+    MEASURE Metricas[FaturamentoMax] = MAXX(fVendas, [FaturamentoItem])
+    MEASURE Metricas[FaturamentoMedia] = AVERAGEX(fVendas, [FaturamentoItem])
+    MEASURE Metricas[FaturamentoMediana] = MEDIANX(fVendas, [FaturamentoItem])
+	
+	MEASURE Metricas[FaturamentoMedioMensal] =
+	AVERAGEX(
+    	SUMMARIZE(
+        	dCalendario,
+        	dCalendario[Ano],
+        	dCalendario[Mês],
+        	"FaturamentoMensal", [Faturamento]
+    	),
+    	[FaturamentoMensal]
+	)
+	
+	MEASURE Metricas[FaturamentoMedioMensal3M] = CALCULATE(
+		[FaturamentoMedioMensal],
+		DATESINPERIOD(
+			dCalendario[Data.Pedido],
+			MAX(dCalendario[Data.Pedido]), -3, MONTH
+		)
+	)
+	
+	MEASURE Metricas[FaturamentoMedioMensal6M] = CALCULATE(
+		[FaturamentoMedioMensal],
+		DATESINPERIOD(
+			dCalendario[Data.Pedido],
+			MAX(dCalendario[Data.Pedido]), -6, MONTH
+		)
+	)
+	
+	MEASURE Metricas[FaturamentoMedioMensal12M] = CALCULATE(
+		[FaturamentoMedioMensal],
+		DATESINPERIOD(
+			dCalendario[Data.Pedido],
+			MAX(dCalendario[Data.Pedido]), -12, MONTH
+		)
+	)
+
+
+    MEASURE Metricas[MediaMovel3M] = AVERAGEX(
+    DATESINPERIOD(dCalendario[Data.Pedido], MAX(dCalendario[Data.Pedido]), -3, MONTH),
+    [Faturamento]
+    )
+	
+	MEASURE Metricas[MediaMove6M] = AVERAGEX(
+    DATESINPERIOD(dCalendario[Data.Pedido], MAX(dCalendario[Data.Pedido]), -6, MONTH),
+    [Faturamento]
+    )
+
+	MEASURE Metricas[MediaMove12M] = AVERAGEX(
+    DATESINPERIOD(dCalendario[Data.Pedido], MAX(dCalendario[Data.Pedido]), -12, MONTH),
+    [Faturamento]
+    )
+
+    MEASURE Metricas[DiasComVenda] = 
+    CALCULATE(
+        DISTINCTCOUNT(dCalendario[Data.Pedido]),
+        fVendas
+    )
+	
+	MEASURE Metricas[% Faturamento Top 10 Produtos] =
+	DIVIDE(
+    CALCULATE([Faturamento],
+        TOPN(10, ALL(dProdutos[Cod.Produto]), [Faturamento])),
+    [Faturamento]
+	)
+	
+	MEASURE Metricas[Taxa de Retencao] =
+VAR DataMaxima = MAX(dCalendario[Data.Pedido])
+VAR DataInicioPeriodo = EDATE(DataMaxima, -12)
+VAR DataFimPeriodoAnterior = EDATE(DataMaxima, -1)
+
+VAR ClientesAtivosInicio =
+    CALCULATE(
+        DISTINCTCOUNT(fVendas[Cod.Cliente]),
+        FILTER(
+            dCalendario,
+            dCalendario[Data.Pedido] >= DataInicioPeriodo && dCalendario[Data.Pedido] < DataFimPeriodoAnterior
+        )
+    )
+
+VAR ClientesAtivosFim =
+    CALCULATE(
+        DISTINCTCOUNT(fVendas[Cod.Cliente]),
+        FILTER(
+            dCalendario,
+            dCalendario[Data.Pedido] >= DataInicioPeriodo && dCalendario[Data.Pedido] <= DataMaxima
+        )
+    )
+
+VAR NovosClientes =
+    CALCULATE(
+        DISTINCTCOUNT(fVendas[Cod.Cliente]),
+        FILTER(
+            fVendas,
+            fVendas[Data.Pedido] >= DataInicioPeriodo && fVendas[Data.Pedido] <= DataMaxima &&
+            NOT(fVendas[Cod.Cliente] IN
+                CALCULATETABLE(
+                    DISTINCT(fVendas[Cod.Cliente]),
+                    FILTER(
+                        dCalendario,
+                        dCalendario[Data.Pedido] < DataInicioPeriodo
+                    )
+                )
+            )
+        )
+    )
+
+RETURN
+    IF(
+        NOT ISBLANK(ClientesAtivosInicio),
+        DIVIDE(ClientesAtivosFim - NovosClientes, ClientesAtivosInicio),
+        BLANK()
+    )
+	
+	MEASURE Metricas[FaturamentoClientes>50k] = CALCULATE(
+	[Faturamento],
+	FILTER(dClientes, [Faturamento] > 50000)
+	)
+	
+	MEASURE Metricas[FaturamentoClientes>50kAno] = SUMX(
+	VALUES(dCalendario[Ano]),
+	[FaturamentoClientes>50k] )
+	

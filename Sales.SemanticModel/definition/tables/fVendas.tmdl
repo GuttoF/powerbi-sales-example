@@ -13,7 +13,7 @@ table fVendas
 	column 'Data.Pedido'
 		dataType: dateTime
 		isHidden
-		formatString: Long Date
+		formatString: Short Date
 		lineageTag: c4436531-8fbd-4a65-bb11-09657dd5482a
 		summarizeBy: none
 		sourceColumn: Data.Pedido

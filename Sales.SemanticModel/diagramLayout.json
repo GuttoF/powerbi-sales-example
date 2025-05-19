@@ -88,25 +88,23 @@
         },
         {
           "location": {
-            "x": 278.44140644597212,
-            "y": 0
-          },
-          "nodeIndex": "Medidas",
-          "nodeLineageTag": "3d852403-2716-45ce-b1e1-f973c3b531ad",
-          "size": {
-            "height": 72,
-            "width": 234
-          },
-          "zIndex": 1,
-          "expandedHeight": 104
-        },
-        {
-          "location": {
             "x": 1204.21184180298,
             "y": 293.97498646311635
           },
           "nodeIndex": "dArmazem",
           "nodeLineageTag": "7e0e261f-8397-403e-8fde-55e93640388f",
+          "size": {
+            "height": 104,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1664.281433772984,
+            "y": 403.33579111172384
+          },
+          "nodeIndex": "Metricas",
           "size": {
             "height": 104,
             "width": 234

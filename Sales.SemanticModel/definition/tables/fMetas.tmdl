@@ -4,7 +4,7 @@ table fMetas
 	column 'Data.Meta'
 		dataType: dateTime
 		isHidden
-		formatString: Long Date
+		formatString: Short Date
 		lineageTag: 0fe8f605-5a77-4bf0-ad0a-9980e7fbec2d
 		summarizeBy: none
 		sourceColumn: Data.Meta
