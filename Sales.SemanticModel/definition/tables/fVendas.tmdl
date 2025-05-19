@@ -100,14 +100,6 @@ table fVendas
 
 		annotation SummarizationSetBy = Automatic
 
-	column 'Vl.Total' = fVendas[Qtde] * fVendas[Vl.Unitario]
-		lineageTag: f93282fa-b5b7-4537-aaed-1fbb7316691c
-		summarizeBy: sum
-
-		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
-
 	partition fVendas = m
 		mode: import
 		source =

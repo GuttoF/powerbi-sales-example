@@ -15,12 +15,10 @@ annotation PBIDesktopVersion = 2.142.1277.0 (25.04)+014fde450f93691fc9537f0758d7
 annotation PBI_ProTooling = ["DevMode"]
 
 ref table fVendas
-ref table DateTableTemplate_d893f530-be70-4912-9c77-ca4781411e09
 ref table dProdutos
 ref table dClientes
 ref table dVendedores
 ref table dCalendario
-ref table LocalDateTable_437742aa-f17e-4344-830d-bf998d245607
 ref table fMetas
 ref table Medidas
 ref table dArmazem

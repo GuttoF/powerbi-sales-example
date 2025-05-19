@@ -12,6 +12,7 @@ let
     #"Trimestre Inserido" = Table.AddColumn(#"Colocar Cada Palavra Em Maiúscula", "Trimestre", each Date.QuarterOfYear([Data.Pedido]), Int64.Type),
     #"Semana do Ano Inserida" = Table.AddColumn(#"Trimestre Inserido", "Semana do Ano", each Date.WeekOfYear([Data.Pedido]), Int64.Type),
     #"Nome do Dia Inserido" = Table.AddColumn(#"Semana do Ano Inserida", "Nome do Dia", each Date.ToText([Data.Pedido], "dddd", "pt-BR"), type text),
-    #"Colocar Cada Palavra Em Maiúscula1" = Table.TransformColumns(#"Nome do Dia Inserido",{{"Nome do Dia", Text.Proper, type text}})
+    #"Colocar Cada Palavra Em Maiúscula1" = Table.TransformColumns(#"Nome do Dia Inserido",{{"Nome do Dia", Text.Proper, type text}}),
+    #"Tipo Alterado" = Table.TransformColumnTypes(#"Colocar Cada Palavra Em Maiúscula1",{{"Data.Pedido", type date}})
 in
-    #"Colocar Cada Palavra Em Maiúscula1"
+    #"Tipo Alterado"

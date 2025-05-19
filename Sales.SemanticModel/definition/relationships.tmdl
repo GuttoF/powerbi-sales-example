@@ -6,11 +6,6 @@ relationship e82c2d3d-3866-35dd-0ec9-64fccf54b6a1
 	fromColumn: fVendas.'Cod.Cliente'
 	toColumn: dClientes.'Cod.Cliente'
 
-relationship 9171688a-92a4-4d24-86d7-1ae22df1fa76
-	joinOnDateBehavior: datePartOnly
-	fromColumn: dCalendario.'Data.Pedido'
-	toColumn: LocalDateTable_437742aa-f17e-4344-830d-bf998d245607.Date
-
 relationship 9e49ac63-b53d-6ebf-7e0e-869d52e749a7
 	fromColumn: fVendas.'Data.Pedido'
 	toColumn: dCalendario.'Data.Pedido'
@@ -23,10 +18,6 @@ relationship 7f81ef3a-0183-0cf4-6cd9-14ece981e258
 	fromColumn: fMetas.'Cod.Produto'
 	toColumn: dProdutos.'Cod.Produto'
 
-relationship 908f0670-b090-67b0-364f-226a0ee4474e
-	fromColumn: fMetas.'Data.Meta'
-	toColumn: dCalendario.'Data.Pedido'
-
 relationship AutoDetected_cfc112fe-8e93-4885-8ecf-fc121be36e25
 	fromColumn: fVendas.Armazem
 	toColumn: dArmazem.Armazem
@@ -34,4 +25,8 @@ relationship AutoDetected_cfc112fe-8e93-4885-8ecf-fc121be36e25
 relationship AutoDetected_8d5d00c4-76db-4477-a723-030ce151316e
 	fromColumn: fMetas.Armazem
 	toColumn: dArmazem.Armazem
+
+relationship 36f6b44d-1429-0f74-695d-31563dffd688
+	fromColumn: fMetas.'Data.Meta'
+	toColumn: dCalendario.'Data.Pedido'
 

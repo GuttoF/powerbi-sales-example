@@ -6,7 +6,7 @@ table Medidas
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
-	measure Faturamento = SUM(fVendas[Vl.Total])
+	measure Faturamento = SUMX(fVendas, fVendas[Qtde] * fVendas[Vl.Unitario])
 		lineageTag: 414ec12b-729d-44e4-9b47-f5bad8c624f4
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
@@ -22,6 +22,87 @@ table Medidas
 	measure 'Var Meta' = [% Vendas Meta] - 1
 		formatString: 0.00%;-0.00%;0.00%
 		lineageTag: 890c55b0-461f-4783-9d10-1479c1ab4d09
+
+	measure VendaMedia = AVERAGEX(fVendas, fVendas[Qtde] * fVendas[Vl.Unitario])
+		lineageTag: dbe0e81c-f5a8-43be-bfca-f4ec7637ed20
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure MenorVenda = MINX(fVendas, fVendas[Qtde] * fVendas[Vl.Unitario])
+		lineageTag: 6c528455-f37c-4368-bba8-b7e954fa1d87
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure MaiorVenda = MAXX(fVendas, fVendas[Qtde] * fVendas[Vl.Unitario])
+		lineageTag: a50f685b-0f15-4cb8-8cc7-90db28c7712a
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure QtdeVendas = COUNTROWS(fVendas)
+		formatString: 0
+		lineageTag: dcdac149-74d3-49bf-873e-ed5a1d942e60
+
+	measure QtdePedidos = DISTINCTCOUNT(fVendas[Pedido])
+		formatString: 0
+		lineageTag: 7f5cfc1f-53d9-4ea5-af27-28407136ef33
+
+	measure QtdeClientes = DISTINCTCOUNT(fVendas[Cod.Cliente])
+		formatString: 0
+		lineageTag: d4c95efc-e9e5-4116-ab2b-98e60ba4f41b
+
+	measure MedianaVendas = MEDIANX(fVendas, fVendas[Qtde] * fVendas[Vl.Unitario])
+		lineageTag: 7a13c103-548e-44ad-8990-c584dffd7af7
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure FaturamentoYoY = ```
+			
+			CALCULATE(
+			    [Faturamento], 
+			    SAMEPERIODLASTYEAR(dCalendario[Data.Pedido])
+			)
+			```
+		lineageTag: 22b52997-c005-400c-83fb-81d3fee14b4e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure '% Faturamento Total' =
+			
+			[Faturamento] /
+			CALCULATE([Faturamento], ALL(fVendas)
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 8a5ea167-5fae-4b23-a778-16c7e9213231
+
+	measure FaturamentoSubTotal =
+			
+			[Faturamento] /
+			CALCULATE(
+			    [Faturamento],
+			    ALLSELECTED(fVendas)
+			)
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: a4ee81e0-8889-47af-b788-d3a0a0f622f9
+
+	measure FaturamentoMoM = ```
+			
+			CALCULATE(
+			    [Faturamento], 
+			    DATEADD(dCalendario[Data.Pedido],  -1, MONTH)
+			)
+			```
+		lineageTag: 3c574217-668a-4be2-9536-0c5663519ac2
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure '% Var YoY' =
+			
+			IF( NOT(ISBLANK([Faturamento])) && NOT(ISBLANK([FaturamentoYoY])),
+			([Faturamento] / [FaturamentoYoY] - 1)
+			)
+		lineageTag: d9cd9c79-9d47-43b3-a286-90ec8aa9e7b2
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	partition Medidas = m
 		mode: import
